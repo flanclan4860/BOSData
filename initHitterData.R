@@ -6,6 +6,8 @@ library(shiny)
 library(dplyr)
 library(data.table)
 
+TARGET <- c(R=74.3, HR=20.0, RBI=74.3, SB=11.8, AVG=0.280)
+
 # Contains just name, team, and pos, used for merging sources
 hitterData <- "./hitter.csv"
 
@@ -120,7 +122,6 @@ getHitterdata <- function(){
      return(combined)
 }
 
-
 hitterStats <- function(hitterData, weight){ 
      mydata <- hitterData %>% 
          group_by(Name, Team, Pos) %>% 
@@ -130,7 +131,10 @@ hitterStats <- function(hitterData, weight){
                    RBI=weighted.mean(RBI, weight, na.rm=TRUE), 
                    SB=weighted.mean(SB, weight, na.rm=TRUE), 
                    AVG=weighted.mean(AVG, weight, na.rm=TRUE)) %>%
-         mutate(FlanaprogTiering = as.integer(tierHitter(R, HR, RBI, SB, AVG))) 
+         mutate(FlanaprogTiering = as.integer(tierHitter(R, HR, RBI, SB, AVG))) %>%
+         mutate(FlanaprogRating = format((HR/TARGET["HR"] + RBI/TARGET["RBI"] + 
+                                  SB/TARGET["SB"] + AVG/TARGET["AVG"] + 
+                                  R/TARGET["R"]), digits=3, nsmall=2))
 
      write.csv(mydata, hitterProjections, row.names=FALSE)
      
