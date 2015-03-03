@@ -2,10 +2,6 @@
 ### Filename: initHitterData.R
 #   March, 2015
 
-library(shiny)
-library(dplyr)
-library(data.table)
-
 getHitterdata <- function(){
      # Get the projected stats data from each source
      data1 <- read.csv(hitterDataSource[1])

@@ -4,6 +4,8 @@ dfPitcherWeight <- read.csv("./pitcherWeight.csv")
 
 # Table used for computing the flanaprog Tier 
 dfHitterTier <- read.csv("./flanHitterTiering.csv")
+dfSPTier <- read.csv("./flanSPTiering.csv")
+dfRPTier <- read.csv("./flanRPTiering.csv")
 
 # Compute flanaprog tier
 tierPlayer <- function(pos, x1, x2, x3, x4, x5) {

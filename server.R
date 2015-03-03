@@ -1,17 +1,5 @@
 
 
-# TARGET <- c(R=74.3, HR=20.0, RBI=74.3, SB=11.8, AVG=0.280, 
-#             Wins=11.67, SO=150.0, SaveHold=39.0, ERA=3.8, WHIP=1.25,
-#             RPWins=5.0, RPSO=50.0, RPSaveHold=39.0, RPERA=3.0, RPWHIP=1.05)
-
-# Holds functions used for setting up the data
-#source("initHitterData.R")
-#source("initPitcherData.R")
-
-# Get data table that holds the player stats
-#dtHitter <<- getHitterdata()
-#dtPitcher <<- getPitcherData()
-
 shinyServer(
   
     function(input,output,session){        

@@ -1,4 +1,9 @@
 
+library(shiny)
+library(dplyr)
+library(data.table)
+
+
 SPratingMult <- 1.5
 RPratingMult <- 1.0
 
@@ -31,3 +36,4 @@ pitcherDataSource <- c("./pitcherData1.csv",
 
 source("initHitterData.R")
 source("initPitcherData.R")
+source("flanaprog.R")

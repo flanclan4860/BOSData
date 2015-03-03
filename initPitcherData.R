@@ -1,6 +1,3 @@
-library(shiny)
-library(dplyr)
-library(data.table)
 
 getPitcherData <- function() {
      data1 <- read.csv(pitcherDataSource[1])
@@ -58,6 +55,8 @@ pitcherStats <- function(pitcherData, weight){
                          SaveHold=weighted.mean(SvH, weight, na.rm=TRUE), 
                          ERA=weighted.mean(ERA, weight, na.rm=TRUE), 
                          WHIP=weighted.mean(WHIP, weight, na.rm=TRUE)) %>%
+                mutate(FlanaprogTiering = 
+                       as.integer(tierPlayer(Pos, Wins, SO, ERA, WHIP, SaveHold))) %>%
                 mutate(FlanaprogRating = 
                        as.numeric(ratePitcher(Pos, Wins, SO, SaveHold, ERA, WHIP)))                      
   
