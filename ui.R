@@ -1,7 +1,9 @@
 library("shiny") 
 
-dfHitterWeight <- read.csv("./hitterWeight.csv")
-dfPitcherWeight <- read.csv("./pitcherWeight.csv")
+#dfHitterWeight <- read.csv("./hitterWeight.csv")
+#dfPitcherWeight <- read.csv("./pitcherWeight.csv")
+
+source("globals.R")
 
 shinyUI(
   

@@ -6,78 +6,6 @@ library(shiny)
 library(dplyr)
 library(data.table)
 
-TARGET <- c(R=74.3, HR=20.0, RBI=74.3, SB=11.8, AVG=0.280)
-
-# Contains just name, team, and pos, used for merging sources
-hitterData <- "./hitter.csv"
-
-# Calculated projected stats
-hitterProjections <- "../BOSDraft/hitterProjections.csv"
-
-# Sources for projected stats
-hitterDataSource <- c("./BOSData1.csv", 
-                 "./FanGraphsHitters.csv", 
-                 "./BOSData2.csv", 
-                 "./BOSData3.csv", 
-                 "./BOSData4.csv")
-
-# Weights for each source, used for calculating weighted mean
-dfHitterWeight <- read.csv("./hitterWeight.csv")
-
-# Table used for computing the flanaprog Tier 
-dtHitterTier <<- data.table(read.csv("./flanHitterTiering.csv"))
-
-# Compute flanaprog tier
-tierHitter <- function(runs, homers, rbi, sb, avg) {
-  
-     tier <- 0
-     Rtier <- 0
-     HRtier <- 0
-     RBItier <- 0
-     SBtier <- 0
-     AVGtier <- 0
-  
-     # Compute tier for Runs
-     for (i in nrow(dtHitterTier):1){
-          if (runs >= dtHitterTier[Tier==i, R]) {
-               Rtier <- i
-               break
-          }
-     }
-     # Compute tier for HR
-     for (i in nrow(dtHitterTier):1){
-          if (homers >= dtHitterTier[Tier==i, HR]) {
-               HRtier <- i
-               break
-          }
-     }
-     # Compute tier for RBI
-     for (i in nrow(dtHitterTier):1){
-          if (rbi >= dtHitterTier[Tier==i, RBI]) {
-               RBItier <- i
-               break
-          }
-     }
-     # Compute tier for SB
-     for (i in nrow(dtHitterTier):1){
-          if (sb >= dtHitterTier[Tier==i, SB]) {
-               SBtier <- i
-               break
-          }
-     }
-     # Computer tier for AVG
-     for (i in nrow(dtHitterTier):1){
-          if (avg >= dtHitterTier[Tier==i, AVG]) {
-               AVGtier <- i
-               break
-          }
-     }
-     
-     # Player tier is the sum of each tier
-     tier <- Rtier+HRtier+RBItier+SBtier+AVGtier
-     return(tier)
-}
-
 getHitterdata <- function(){
      # Get the projected stats data from each source
      data1 <- read.csv(hitterDataSource[1])
@@ -131,14 +59,13 @@ hitterStats <- function(hitterData, weight){
                    RBI=weighted.mean(RBI, weight, na.rm=TRUE), 
                    SB=weighted.mean(SB, weight, na.rm=TRUE), 
                    AVG=weighted.mean(AVG, weight, na.rm=TRUE)) %>%
-         mutate(FlanaprogTiering = as.integer(tierHitter(R, HR, RBI, SB, AVG))) %>%
-         mutate(FlanaprogRating = format((HR/TARGET["HR"] + RBI/TARGET["RBI"] + 
-                                  SB/TARGET["SB"] + AVG/TARGET["AVG"] + 
-                                  R/TARGET["R"]), digits=3, nsmall=2))
+         mutate(FlanaprogTiering = as.integer(tierPlayer(Pos, R, HR, RBI, SB, AVG))) %>%
+         mutate(FlanaprogRating = as.numeric(rateHitter(R, HR, RBI, SB, AVG)))
 
      write.csv(mydata, hitterProjections, row.names=FALSE)
      
      return(data.frame(mydata))
 }
 
+dtHitter <<- getHitterdata()
 

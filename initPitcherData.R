@@ -2,17 +2,6 @@ library(shiny)
 library(dplyr)
 library(data.table)
 
-pitcherData <- "./pitcher.csv"
-pitcherProjections <- "../BOSDraft/pitcherProjections.csv"
-
-pitcherDataSource <- c("./pitcherData1.csv",
-                       "./FanGraphsPitchers.csv",
-                       "./FanGraphsPitchers.csv",
-                       "./FanGraphsPitchers.csv",
-                       "./FanGraphsPitchers.csv")
-
-dfPitcherWeight <- read.csv("./pitcherWeight.csv")
-
 getPitcherData <- function() {
      data1 <- read.csv(pitcherDataSource[1])
      data1 <- mutate(data1, IP=Innings, W=Wins, SO=20, SvH=Saves+Holds)
@@ -68,11 +57,13 @@ pitcherStats <- function(pitcherData, weight){
                          SO=weighted.mean(SO, weight, na.rm=TRUE),
                          SaveHold=weighted.mean(SvH, weight, na.rm=TRUE), 
                          ERA=weighted.mean(ERA, weight, na.rm=TRUE), 
-                         WHIP=weighted.mean(WHIP, weight, na.rm=TRUE)) 
+                         WHIP=weighted.mean(WHIP, weight, na.rm=TRUE)) %>%
+                mutate(FlanaprogRating = 
+                       as.numeric(ratePitcher(Pos, Wins, SO, SaveHold, ERA, WHIP)))                      
   
      write.csv(mydata, pitcherProjections, row.names=FALSE)
   
      return(data.frame(mydata))
 }
 
-
+dtPitcher <<- getPitcherData()
