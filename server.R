@@ -1,21 +1,30 @@
 
+# Filename: server.R
+# Contains render functions for BOSData app
+
+# There are two tables, one for hitters and one for pitchers
+# When the user changes the weight factor inputs, the stats are recalculated
 
 shinyServer(
   
     function(input,output,session){        
          
-         # Output Projected Stats Table
+         # Output Projected Stats Table for hitters
           output$hittersTable <- renderDataTable({
                
-               weight <- c(input$hw1, input$hw2, input$hw3, input$hw4, input$hw5)
-               
+              # Updata data table with weight factors from user input
+               dtHitter <- dtHitter %>% 
+                           mutate(Weight=inputHitterWeight(Source, input))
                # Compute the weighted means for each player
                # Re-computed when one of the inputs changes
-               df <- hitterStats(dtHitter, weight) 
+               df <- data.frame(hitterStats()) 
                
                # Store the new weights
-               dfHitterWeight$Weight <- weight
-               write.csv(dfHitterWeight, "./hitterWeight.csv", row.names=FALSE)
+               hitterSource <- hitterSource %>% 
+                               mutate(Weight=inputHitterWeight(Num, input))
+               
+               dtSource <- rbind(pitcherSource, hitterSource)
+               write.csv(dtSource, "./dtSource.csv", row.names=FALSE)
                
                return(df)
           }
@@ -24,15 +33,20 @@ shinyServer(
           
           output$pitcherTable <- renderDataTable({
             
-            weight <- c(input$pw1, input$pw2, input$pw3, input$pw4, input$pw5)
+            # Updata data table with weight factors from user input
+            dtPitcher <- dtPitcher %>% 
+                         mutate(Weight=inputPitcherWeight(Source, input))
             
             # Compute the weighted means for each player
             # Re-computed when one of the inputs changes
-            df <- pitcherStats(dtPitcher, weight) 
+            df <- data.frame(pitcherStats()) 
             
             # Store the new weights
-            dfPitcherWeight$Weight <- weight
-            write.csv(dfPitcherWeight, "./pitcherWeight.csv", row.names=FALSE)
+            pitcherSource <- pitcherSource %>% 
+                             mutate(Weight=inputPitcherWeight(Num, input))
+            
+            dtSource <- rbind(pitcherSource, hitterSource)
+            write.csv(dtSource, "./dtSource.csv", row.names=FALSE)
             
             return(df)
             
