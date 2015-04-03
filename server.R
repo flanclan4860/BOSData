@@ -1,4 +1,5 @@
 
+# Application: BOSData
 # Filename: server.R
 # Contains render functions for BOSData app
 
@@ -9,46 +10,45 @@ shinyServer(
   
     function(input,output,session){        
          
-         # Output Projected Stats Table for hitters
+         # Display Projected Stats Table for hitters
           output$hittersTable <- renderDataTable({
                
-              # Updata data table with weight factors from user input
+              # Store new weight factors (from user input) 
                dtHitter <- dtHitter %>% 
                            mutate(Weight=inputHitterWeight(Source, input))
+            
+               # Write the new weights to file
+               hitterSourceInfo <- hitterSourceInfo %>% 
+                                   mutate(Weight=inputHitterWeight(Num, input))
+               dtSourceInfo <- rbind(pitcherSourceInfo, hitterSourceInfo)
+               write.csv(dtSourceInfo, sourceInfoFile, row.names=FALSE)
+               
                # Compute the weighted means for each player
                # Re-computed when one of the inputs changes
                df <- data.frame(hitterStats()) 
-               
-               # Store the new weights
-               hitterSource <- hitterSource %>% 
-                               mutate(Weight=inputHitterWeight(Num, input))
-               
-               dtSource <- rbind(pitcherSource, hitterSource)
-               write.csv(dtSource, "./dtSource.csv", row.names=FALSE)
-               
                return(df)
           }
           , options=list(info=FALSE, paging=FALSE)
           )
           
+          # Display Projected Stats Table for pitchers
           output$pitcherTable <- renderDataTable({
             
-            # Updata data table with weight factors from user input
-            dtPitcher <- dtPitcher %>% 
-                         mutate(Weight=inputPitcherWeight(Source, input))
+               # Store new weight factors (from user input) 
+               dtPitcher <- dtPitcher %>% 
+                            mutate(Weight=inputPitcherWeight(Source, input)) 
             
-            # Compute the weighted means for each player
-            # Re-computed when one of the inputs changes
-            df <- data.frame(pitcherStats()) 
+               # Write the new weights to file
+               pitcherSourceInfo <- pitcherSourceInfo %>% 
+                                mutate(Weight=inputPitcherWeight(Num, input))
             
-            # Store the new weights
-            pitcherSource <- pitcherSource %>% 
-                             mutate(Weight=inputPitcherWeight(Num, input))
+               dtSourceInfo <- rbind(pitcherSourceInfo, hitterSourceInfo)
+               write.csv(dtSourceInfo, sourceInfoFile, row.names=FALSE)
             
-            dtSource <- rbind(pitcherSource, hitterSource)
-            write.csv(dtSource, "./dtSource.csv", row.names=FALSE)
-            
-            return(df)
+               # Compute the weighted means for each player
+               # Re-computed when one of the inputs changes
+               df <- data.frame(pitcherStats()) 
+               return(df)
             
           }
           , options=list(info=FALSE, paging=FALSE)
